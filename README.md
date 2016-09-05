@@ -27,7 +27,8 @@ If there are no errors, then you can upload the compiled sketch to the Arduino
 make upload
 ````
 
-If Ruby and [Bundler](http://bundler.io) are not already installed, install them. I use [RVM](https://rvm.io/) to install Ruby, but you can use `rbenv`, Homebrew (on OS X), or a package manager in Linux (although the latter will install an older stable release of Ruby)
+If Ruby and [Bundler](http://bundler.io) are not already installed, install them. I use [RVM](https://rvm.io/) to install Ruby, but you can use `rbenv`, Homebrew (on OS X), or a package manager in Linux (although the latter will install an older stable release of Ruby).
+
 Then run the `serialport.rb` Ruby script
 
 ````
