@@ -1,29 +1,47 @@
 require 'rubygems'
 require 'serialport'
 require 'pubnub'
- 
-#params for serial port
-port_str = '/dev/ttyACM0'
-baud_rate = 9600
-data_bits = 8
-stop_bits = 1
-parity = SerialPort::NONE
 
-#Pubnub keys
-subscribe_key = ENV['PUBNUB_SUB_KEY']
-publish_key = ENV['PUBNUB_PUB_KEY']
+class ArduinoAlarm
+  attr_accessor :sp, :pubnub
 
-sp = SerialPort.new(port_str, baud_rate, data_bits, stop_bits, parity)
-pubnub = Pubnub.new(subscribe_key: subscribe_key, publish_key: publish_key)
+  #params for serial port
+  PORT_STR = '/dev/ttyACM0'
+  BAUD_RATE = 9600
+  DATA_BITS = 8
+  STOP_BITS = 1
+  PARITY = SerialPort::NONE
+  
+  #Pubnub keys
+  SUBSCRIBE_KEY = ENV['PUBNUB_SUB_KEY']
+  PUBLISH_KEY = ENV['PUBNUB_PUB_KEY']
+  
+  def initialize
+    puts 'Initializing...'
+    @sp = SerialPort.new(PORT_STR, BAUD_RATE, DATA_BITS, STOP_BITS, PARITY)
+    @pubnub = Pubnub.new(subscribe_key: SUBSCRIBE_KEY, publish_key: PUBLISH_KEY)
+  end
 
-while true do
-  message = sp.gets
-  if message
-    message.chomp!
-    puts message
+  def listen
+    puts 'Listening...'
 
+    while true do
+      message = sp.gets
+      message.chomp!
+      puts message
+      
+      case message
+        when 'Loud sound detected!'
+          publish('loud_noise_notifications', message)
+      end
+    end
+  end 
+  
+  private
+
+  def publish(channel, message)
     pubnub.publish(
-      channel: 'loud_noise_notifications',
+      channel: channel,
       message: { text: message }
     ) do |envelope|
       puts envelope.status
@@ -31,3 +49,5 @@ while true do
   end
 end
 
+arduino_alarm = ArduinoAlarm.new
+arduino_alarm.listen
